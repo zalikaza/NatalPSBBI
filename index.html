@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natal PSBBI Bandung Raya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comfortaa', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            z-index: 1;
+            user-select: none;
+            pointer-events: none;
+            color: white;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .countdown-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        #countdownCanvas {
+            width: 100%;
+            border-radius: 20px;
+            display: block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .button-container {
+            margin-top: 25px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Comfortaa', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.7);
+        }
+
+        .save-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .save-icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        @media (max-width: 600px) {
+            .save-btn {
+                padding: 14px 35px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="countdown-wrapper">
+            <canvas id="countdownCanvas"></canvas>
+        </div>
+        <div class="button-container">
+            <button class="save-btn" onclick="saveImage()">
+                <svg class="save-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                    <polyline points="17 21 17 13 7 13 7 21"/>
+                    <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Simpan
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // CUSTOMISASI DI SINI! 👇
+        // ========================================
+        const CONFIG = {
+            // Posisi Y untuk setiap elemen (makin kecil = makin ke atas)
+            titleY1: 290,           // "NATAL PSBBI"
+            titleY2: 350,           // "BANDUNG RAYA"
+            numberY: 510,           // Angka countdown (29)
+            badgeY: 600,            // ⬅️ UBAH INI untuk geser "hari lagi" (makin kecil = makin ke atas)
+            dateY: 695,             // Tanggal
+            
+            // Ukuran font
+            titleFontSize: 50,
+            numberFontSize: 190,
+            badgeFontSize: 32,
+            dateFontSize: 36,
+            
+            // Warna
+            badgeColor: '#4ECDC4',  // Warna badge "hari lagi"
+            textColor: '#FFFFFF',   // Warna teks
+            
+            // Ukuran badge
+            badgeWidth: 210,
+            badgeHeight: 60,
+            badgeRadius: 30
+        };
+        // ========================================
+
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.innerHTML = '❆';
+            snowflake.style.left = Math.random() * 100 + '%';
+            snowflake.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            snowflake.style.opacity = Math.random() * 0.5 + 0.2;
+            snowflake.style.fontSize = (Math.random() * 8 + 10) + 'px';
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => snowflake.remove(), 25000);
+        }
+
+        setInterval(createSnowflake, 400);
+        for (let i = 0; i < 12; i++) {
+            setTimeout(createSnowflake, i * 300);
+        }
+
+        const canvas = document.getElementById('countdownCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = 1024;
+        canvas.height = 1024;
+
+        // Load font terlebih dahulu
+        const fontLoaded = new FontFace('Comfortaa', 'url(https://fonts.gstatic.com/s/comfortaa/v45/1Pt_g8LJRfWJmhDAuUsSQamb1W0lwk4S4TbMPrQVIT9c2c8.woff2)');
+        
+        fontLoaded.load().then(function(loadedFont) {
+            document.fonts.add(loadedFont);
+            console.log('✅ Font Comfortaa berhasil dimuat!');
+        }).catch(function(error) {
+            console.log('⚠️ Font gagal dimuat, menggunakan font default');
+        });
+
+        const bgImage = new Image();
+        let imageLoaded = false;
+
+        bgImage.onload = function() {
+            imageLoaded = true;
+            console.log('✅ Background image berhasil dimuat!');
+            drawCountdown();
+        };
+
+        bgImage.onerror = function() {
+            console.error('❌ Gagal memuat bg.png');
+            alert('⚠️ File bg.png tidak ditemukan!\n\nPastikan:\n1. File bg.png ada di folder yang SAMA dengan file HTML\n2. Nama file HARUS "bg.png" (huruf kecil semua)\n3. Coba refresh halaman (F5)');
+        };
+
+        // Coba load gambar (set CORS hint dan hindari query string)
+        bgImage.crossOrigin = 'anonymous';
+        bgImage.src = 'bg.png';
+
+        function calculateDaysLeft() {
+            const targetDate = new Date('2025-12-18T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const diffTime = targetDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays > 0 ? diffDays : 0;
+        }
+
+        function drawCountdown() {
+            if (!imageLoaded) {
+                console.log('⏳ Menunggu gambar dimuat...');
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+            
+            const daysLeft = calculateDaysLeft();
+            
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Title dengan font Comfortaa
+            ctx.fillStyle = CONFIG.textColor;
+            ctx.font = `600 ${CONFIG.titleFontSize}px Comfortaa, Poppins, sans-serif`;
+            ctx.fillText('NATAL PSBBI', canvas.width / 2, CONFIG.titleY1);
+            ctx.fillText('BANDUNG RAYA', canvas.width / 2, CONFIG.titleY2);
+            
+            // Number
+            ctx.font = `700 ${CONFIG.numberFontSize}px Comfortaa, Poppins, sans-serif`;
+            ctx.fillText(daysLeft, canvas.width / 2, CONFIG.numberY);
+            
+            // Badge "hari lagi" - posisi bisa diubah di CONFIG.badgeY
+            const badgeX = canvas.width / 2 - CONFIG.badgeWidth / 2;
+            
+            ctx.fillStyle = CONFIG.badgeColor;
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(badgeX, CONFIG.badgeY, CONFIG.badgeWidth, CONFIG.badgeHeight, CONFIG.badgeRadius);
+            } else {
+                // Fallback untuk browser lama
+                ctx.rect(badgeX, CONFIG.badgeY, CONFIG.badgeWidth, CONFIG.badgeHeight);
+            }
+            ctx.fill();
+            
+            // Text "hari lagi"
+            ctx.fillStyle = CONFIG.textColor;
+            ctx.font = `600 ${CONFIG.badgeFontSize}px Comfortaa, Poppins, sans-serif`;
+            ctx.fillText('hari lagi', canvas.width / 2, CONFIG.badgeY + CONFIG.badgeHeight / 2);
+            
+            // Date
+            ctx.font = `600 ${CONFIG.dateFontSize}px Comfortaa, Poppins, sans-serif`;
+            ctx.fillText('Kam, 18 Desember 2025', canvas.width / 2, CONFIG.dateY);
+        }
+
+        // Update setiap menit
+        setInterval(() => {
+            if (imageLoaded) drawCountdown();
+        }, 60000);
+
+        function saveImage() {
+            if (!imageLoaded) {
+                alert('⚠️ Gambar background belum dimuat!\n\nPastikan file bg.png ada di folder yang sama dengan HTML ini, lalu refresh halaman (tekan F5).');
+                return;
+            }
+
+            try {
+                // Buat canvas baru untuk export
+                const exportCanvas = document.createElement('canvas');
+                exportCanvas.width = 1024;
+                exportCanvas.height = 1024;
+                const exportCtx = exportCanvas.getContext('2d');
+                
+                // Copy isi canvas ke export canvas
+                exportCtx.drawImage(canvas, 0, 0);
+                
+                // Convert ke data URL
+                const dataURL = exportCanvas.toDataURL('image/png', 1.0);
+                
+                // Download
+                const link = document.createElement('a');
+                const timestamp = new Date().getTime();
+                link.download = `natal-psbbi-${timestamp}.png`;
+                link.href = dataURL;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log('✅ Gambar berhasil disimpan!');
+                
+            } catch (error) {
+                console.error('❌ Error saat menyimpan:', error);
+                alert('❌ Gagal menyimpan gambar!\n\nError: ' + error.message + '\n\nCoba:\n1. Pastikan bg.png ada di folder yang sama\n2. Buka file HTML ini dengan double-click (bukan dari server)\n3. Gunakan browser Chrome atau Firefox');
+            }
+        }
+
+        // Debug info
+        console.log('📁 Lokasi file HTML:', window.location.href);
+        console.log('🖼️ Mencoba load gambar dari:', bgImage.src);
+    </script>
+</body>
+</html>
