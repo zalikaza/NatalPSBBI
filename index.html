@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Natal PSBBI Bandung Raya</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Stack Sans Headline';
+            src: url('./fonts/stack-sans-headline.woff2') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -15,7 +19,7 @@
         }
 
         body {
-            font-family: 'Comfortaa', 'Poppins', sans-serif;
+            font-family: 'Stack Sans Headline', 'Poppins', sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
             display: flex;
             justify-content: center;
@@ -61,7 +65,7 @@
 
         #countdownCanvas {
             width: 100%;
-            border-radius: 20px;
+            border-radius: 30px;
             display: block;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
@@ -77,7 +81,7 @@
             padding: 16px 45px;
             font-size: 18px;
             font-weight: 700;
-            font-family: 'Comfortaa', sans-serif;
+            font-family: 'Stack Sans Headline', sans-serif;
             border-radius: 50px;
             cursor: pointer;
             display: inline-flex;
@@ -146,10 +150,10 @@
             dateFontSize: 36,
             
             // Font families (ubah sesuka kamu)
-            titleFontFamily: 'Comfortaa, Poppins, sans-serif',
-            numberFontFamily: 'Comfortaa, Poppins, sans-serif',
-            badgeFontFamily: 'Comfortaa, Poppins, sans-serif',
-            dateFontFamily: 'Comfortaa, Poppins, sans-serif',
+            titleFontFamily: 'Stack Sans Headline, Poppins, sans-serif',
+            numberFontFamily: 'Stack Sans Headline, Poppins, sans-serif',
+            badgeFontFamily: 'Stack Sans Headline, Poppins, sans-serif',
+            dateFontFamily: 'Stack Sans Headline, Poppins, sans-serif',
             
             // Font weights
             titleFontWeight: 600,
@@ -192,15 +196,16 @@
         canvas.width = 1024;
         canvas.height = 1024;
 
-        // Load font terlebih dahulu
-        const fontLoaded = new FontFace('Comfortaa', 'url(https://fonts.gstatic.com/s/comfortaa/v45/1Pt_g8LJRfWJmhDAuUsSQamb1W0lwk4S4TbMPrQVIT9c2c8.woff2)');
-        
-        fontLoaded.load().then(function(loadedFont) {
-            document.fonts.add(loadedFont);
-            console.log('✅ Font Comfortaa berhasil dimuat!');
-        }).catch(function(error) {
-            console.log('⚠️ Font gagal dimuat, menggunakan font default');
-        });
+        // Load font lokal terlebih dahulu
+        const fontLoaded = new FontFace('Stack Sans Headline', 'url(./fonts/stack-sans-headline.woff2)');
+        fontLoaded.load()
+            .then(function(loadedFont) {
+                document.fonts.add(loadedFont);
+                console.log('✅ Font Stack Sans Headline berhasil dimuat!');
+            })
+            .catch(function(error) {
+                console.log('⚠️ Font Stack Sans Headline gagal dimuat, menggunakan font default');
+            });
 
         const bgImage = new Image();
         let imageLoaded = false;
